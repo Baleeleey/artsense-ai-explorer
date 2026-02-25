@@ -70,7 +70,9 @@ const Index = () => {
             <h2 className="font-serif text-2xl font-semibold text-center text-foreground mb-8">
               Résultats de l'analyse
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Secondary models side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-8">
               <ResultCard
                 modelName="Logistic Regression"
                 modelType="logistic"
@@ -83,6 +85,10 @@ const Index = () => {
                 predictedStyle={results.xgboost.style}
                 confidence={results.xgboost.confidence}
               />
+            </div>
+
+            {/* CNN Expert card — centered and prominent */}
+            <div className="max-w-lg mx-auto">
               <ResultCard
                 modelName="CNN - Expert"
                 modelType="cnn"
