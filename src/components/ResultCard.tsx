@@ -1,4 +1,6 @@
-import { Trophy, TrendingUp, Brain } from "lucide-react";
+import { useState } from "react";
+import { Trophy, TrendingUp, Brain, ChevronDown, BookOpen, Palette, Users, Info } from "lucide-react";
+import { artMovementsData, type ArtMovementDetails } from "@/data/artMovements";
 
 interface ResultCardProps {
   modelName: string;
@@ -21,7 +23,10 @@ const modelLabels = {
 };
 
 const ResultCard = ({ modelType, predictedStyle, confidence, isExpert }: ResultCardProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
   const Icon = modelIcons[modelType];
+
+  const movementDetails: ArtMovementDetails | undefined = artMovementsData[predictedStyle];
 
   return (
     <div className={`model-card model-card-${modelType} ${isExpert ? "animate-pulse-glow" : ""}`}>
@@ -66,8 +71,111 @@ const ResultCard = ({ modelType, predictedStyle, confidence, isExpert }: ResultC
           </div>
         </div>
       </div>
+
+      {/* Voir plus de détails button */}
+      {movementDetails && (
+        <div className="mt-5">
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium 
+              bg-secondary text-secondary-foreground hover:bg-accent transition-all duration-200"
+          >
+            Voir plus de détails
+            <ChevronDown
+              className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-out ${
+              isExpanded ? "max-h-[2000px] opacity-100 mt-5" : "max-h-0 opacity-0 mt-0"
+            }`}
+          >
+            <div className="space-y-5 border-t border-border pt-5">
+              {/* Définition */}
+              <DetailSection
+                icon={<BookOpen className="w-4 h-4 model-accent" />}
+                title="Définition"
+              >
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {movementDetails.definition}
+                </p>
+                {movementDetails.fondateurs && (
+                  <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+                    <span className="font-medium text-foreground">Fondateurs :</span>{" "}
+                    {movementDetails.fondateurs}
+                  </p>
+                )}
+              </DetailSection>
+
+              {/* Artistes principaux */}
+              <DetailSection
+                icon={<Users className="w-4 h-4 model-accent" />}
+                title="Artistes principaux"
+              >
+                <ul className="space-y-1.5">
+                  {movementDetails.artistes.map((artist, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="model-accent mt-1.5 w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                      {artist}
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+
+              {/* Caractéristiques */}
+              <DetailSection
+                icon={<Palette className="w-4 h-4 model-accent" />}
+                title="Caractéristiques"
+              >
+                <ul className="space-y-1.5">
+                  {movementDetails.caracteristiques.map((c, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="model-accent mt-1.5 w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                      {c}
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+
+              {/* Informations importantes */}
+              <DetailSection
+                icon={<Info className="w-4 h-4 model-accent" />}
+                title="Informations importantes"
+              >
+                <ul className="space-y-1.5">
+                  {movementDetails.informations.map((info, i) => (
+                    <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                      <span className="model-accent mt-1.5 w-1.5 h-1.5 rounded-full bg-current shrink-0" />
+                      {info}
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+const DetailSection = ({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) => (
+  <div>
+    <div className="flex items-center gap-2 mb-2">
+      {icon}
+      <h4 className="font-serif text-sm font-semibold text-foreground">{title}</h4>
+    </div>
+    {children}
+  </div>
+);
 
 export default ResultCard;
